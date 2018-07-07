@@ -1,0 +1,11 @@
+{
+  "MISSING_DIRS": "Settings does not contain a directories listing; Parsony requires both services and www directories.",
+  "MISSING_MODELS": "Settings missing a models directory.",
+  "MISSING_SERVICES": "Settings missing a services directory.",
+  "MISSING_WWW": "Settings missing a www directory.",
+  "MISSING_CONFIGS": "Settings does not contain a configs file. Basic configuration is required.",
+  "MISSING_FILES": "Settings does not contain a files object. Files should include a config and 404 path.",
+  "INVALID_ENV": "No configuration found for PARSONY_ENV = ",
+  "DB_FAIL": "DB Connection failed; server was not started.",
+  "INIT_FAIL": "Could not initiate Parsony. Error: "
+}

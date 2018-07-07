@@ -1,0 +1,150 @@
+{
+
+  "USER_NOT_FOUND" :{
+    "code": 404,
+    "type":"invalid_user",
+    "msg":"User not found.",
+    "detail":"The provided username could not be found."
+  },
+  "INVALID_CREDENTIALS" :{
+    "code": 401,
+    "type":"invalid_credentials",
+    "msg":"Authentication credentials invalid.",
+    "detail":"The username and password provided do not match any records."
+  },
+  "API_KEY":{
+    "NONE_RECEIVED":{
+      "code": 400,
+      "type":"missing_api_key",
+      "msg":"API key required.",
+      "detail":"API Method required API - none was provided."
+    },
+    "CACHE_ERROR":{
+      "code": 500,
+      "type":"server_error",
+      "msg":"Cannot access API key cache",
+      "detail":"[CRITICAL]: Cache returned fatal error. Could not confirm API Key. Please report this bug."
+    },
+    "INVALID":{
+      "code": 401,
+      "type":"invalid_api_key",
+      "msg":"API Key Invalid.",
+      "detail":"The provided API Key is invalid."
+    }
+  },
+  "SIGNED":{
+    "NO_SECRET":{
+      "code": 401,
+      "type":"api_key_secret",
+      "msg":"Missing secret for API key.",
+      "detail":"Missing secret for API key."
+    },
+    "INVALID_SIGNATURE":{
+      "code": 401,
+      "type":"invalid_signature",
+      "msg":"Signature fails authentication.",
+      "detail":"Payload signature not valid for API Key Holder."
+    }
+  },
+  "SESSION" :{
+    "INVALID" :{
+      "code": 403,
+      "type":"invalid_token",
+      "msg":"No valid session found for token.",
+      "detail":"A session token was provided but was not valid."
+    },
+    "CREATION_ERROR":{
+      "code": 500,
+      "type":"server_error",
+      "msg":"Cannot create session.",
+      "detail":"[CRITICAL]: A session could not be created for the error. Please report this bug."
+    },
+    "DB_WRITE_ERROR":{
+      "code": 500,
+      "type":"server_error",
+      "msg":"Cannot save session.",
+      "detail":"[CRITICAL]: Failed to save session to persistent store. Please report this bug."
+    },
+    "FLUSH_CACHE_ERROR": {
+      "code": 500,
+      "type":"server_error",
+      "msg":"Cannot flush session.",
+      "detail":"[CRITICAL]: The session could not be flushed from cache. Please report this bug."
+    },
+    "NO_TOKEN":{
+      "code": 401,
+      "type":"missing_token",
+      "msg":"Missing required token.",
+      "detail":"This request requires a valid session token - no token was provided."
+    }
+  },
+  "REQUEST":{
+    "NO_ARGS":{
+      "code": 400,
+      "type":"missing_args",
+      "msg":"No arguments supplied.",
+      "detail":"API request missing args object. If no args, send an empty object {}."
+    },
+    "NO_METHOD_FOUND":{
+      "code": 501,
+      "type":"method_not_found",
+      "msg":"Method not found.",
+      "detail":"The requested method was not found."
+    },
+    "NO_METHOD_SUPPLIED":{
+      "code": 400,
+      "type":"method_required",
+      "msg":"No method supplied.",
+      "detail":"API request missing method."
+    },
+    "MALFORMED_VALIDATION":{
+      "code": 400,
+      "type":"malformed_request",
+      "msg":"Arguments fail validation.",
+      "detail":"Supplied arguments do not conform to expected data structure."
+    },
+    "MALFORMED_JSON":{
+      "code": 400,
+      "type":"malformed_request",
+      "msg":"Invalid JSON.",
+      "detail":"API received malformed or invalid JSON."
+    }
+  },
+  "SERVER_ERROR" : {
+    "code": 500,
+    "type": "internal_error",
+    "msg": "An error has occurred."
+  },
+  "DB_ERROR" : {
+    "code": 500,
+    "type": "internal_error",
+    "msg": "An error has occurred."
+  },
+  "MODEL_ERROR" :{
+    "code":500,
+    "type": "model_error",
+    "msg" :"A data access error has occurred."
+  },
+  "EMAIL" :{
+    "TRANSPORT" : {
+      "code" : 500,
+      "type": "network_error",
+      "msg" : "Cannot connect to mail server."
+    },
+    "TEMPLATE":{
+      "code" : 500,
+      "type": "html_template_error",
+      "msg" :"Could not generate HTML email from template."
+    },
+    "NOT_SENT":{
+      "code" : 500,
+      "type": "html_send_error",
+      "msg" :"Could not send email."
+    },
+    "NO_SENDER":{
+      "code" : 500,
+      "type": "no_sender",
+      "msg" :"Could not send email. No sender provided."
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "recurseDepth": 5,
+  "source": {
+    "include":["lib", "index.js"],
+    "excludePattern": "(node_modules|docs)"
+  }
+}
