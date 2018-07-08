@@ -162,6 +162,7 @@ function _addParsonyToModules() {
 function _attachDirectoriesWith(settings) {
   _validateSettings(settings);
   const dirs = settings[DIRS];
+  _mkDirs(dirs);
   _attachModels(dirs[MODELS]);
   _attachServices(dirs[SERVICES]);
   _setStaticDir(dirs[WWW]);
@@ -170,6 +171,16 @@ function _attachDirectoriesWith(settings) {
   }
   if (dirs.hasOwnProperty(TEMPLATES)) {
     _attachTemplatesDir(dirs[TEMPLATES]);
+  }
+}
+
+function _mkDirs(dirs){
+  for(let key in dirs){
+    if(dirs.hasOwnProperty(key)){
+      if(!fs.existsSync(dirs[key])){
+        fs.mkdirSync(dirs[key])
+      }
+    }
   }
 }
 

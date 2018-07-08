@@ -2,15 +2,17 @@
   "name": "parsony",
   "version": "1.0.0",
   "description": "API Engine for Parsony Framework.",
-  "keywords": ["JSON-RPC, API, Rapid Development"],
+  "keywords": [
+    "JSON-RPC, API, Rapid Development"
+  ],
   "main": "index.js",
   "scripts": {
     "docs": "jsdoc -r -c jsdoc-config.json -d docs"
   },
   "author": {
-    "name":"Eric Phelan",
-    "email" :"eric@ericphelan.com",
-    "url":"http://ericphelan.com"
+    "name": "Eric Phelan",
+    "email": "eric@ericphelan.com",
+    "url": "http://ericphelan.com"
   },
   "license": "MIT",
   "dependencies": {
