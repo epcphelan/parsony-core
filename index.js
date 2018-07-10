@@ -2,10 +2,14 @@
  * Parsony root
  * @module /parsony
  */
-
+const path = require("path");
 const express = require("express");
 const body_parser = require("body-parser");
 const fs = require("fs");
+const chalk = require('chalk');
+const figlet = require('figlet');
+const clear = require("clear");
+
 const { dateTime } = require("./lib/utils");
 const db = require("./lib/db");
 const http = require("./lib/http");
@@ -18,6 +22,7 @@ const utils = require('./lib/utils');
 const services = require("./lib/services/services");
 const errors = require("./lib/errors/errors.json");
 const EXIT = require("./lib/errors/startupExitMessages");
+
 const {
   CONFIG: { API_DEBUG, HTTP_PORT, API_ENDPOINT },
   SETTINGS: {
@@ -32,18 +37,20 @@ const {
     _404
   }
 } = require("./lib/enums");
+
 const {
   setScheduledDirectory,
   createScheduledTasks,
   start
 } = require("./lib/scheduled");
+
 const ENV_VARS = {
   PARSONY_ENV: "PARSONY_ENV",
   API_DEBUG: "API_DEBUG",
   DROP_DB: "DROP_DB",
   LOCAL: "local"
 };
-const DEFAULT_404 = "./static/404.html";
+
 const DEFAULT_CONFIGS = {
   local: {
     api_endpoint: "json-api",
@@ -52,11 +59,13 @@ const DEFAULT_CONFIGS = {
     api_debug: false
   }
 };
+
+const DEFAULT_404 = "./static/404.html";
 const parsony = {};
-
-
-let app;
 let instantiated = false;
+let pFile;
+let app;
+
 const init = settings => {
   try {
     _init(settings);
@@ -74,6 +83,7 @@ function _init(settings) {
   _bindMiddlewares();
   _add404(_404);
   _attachDirectoriesWith(settings);
+  _projectFile();
 }
 
 function _configsFromSettings(settings) {
@@ -174,6 +184,16 @@ function _attachDirectoriesWith(settings) {
   }
 }
 
+function _projectFile(){
+  const p = path.join(process.cwd(),'.parsony.json');
+  if(!fs.existsSync(p)){
+    const pUtilPath = path.join(__dirname,'lib','utils','.parsony.json');
+    const pUtil = fs.readFileSync(pUtilPath);
+    fs.writeFileSync(p,pUtil);
+  }
+  pFile = require(p);
+}
+
 function _mkDirs(dirs){
   for(let key in dirs){
     if(dirs.hasOwnProperty(key)){
@@ -230,28 +250,29 @@ function _attachTemplatesDir(directory) {
 }
 
 async function _startupSequence() {
+  clear();
   console.log(_startupStartStmt());
 
   _setDBPool();
-  console.log(` Database Pool instantiated...`);
+  console.log(`\u272A  Database Pool instantiated...`);
 
   const conn = await _getDBConnection();
-  console.log(` Successfully connected to database...`);
+  console.log(`\u272A  Successfully connected to database...`);
 
   services.start();
-  console.log(` API Services configured and attached to routes...`);
+  console.log(`\u272A  API Services configured and attached to routes...`);
 
   _bind404toApp();
-  console.log(` Path to static 404 HTML page set...`);
+  console.log(`\u272A  Path to static 404 HTML page set...`);
 
   await _disableDBForeignKeyChecks(conn);
-  console.log(` Database Foreign Key Checks disabled...`);
+  console.log(`\u272A  Database Foreign Key Checks disabled...`);
 
   await _synchronizeModels();
-  console.log(` Models synchronized`);
+  console.log(`\u272A  Models synchronized`);
 
   await _enableDBForeignKeyChecks(conn);
-  console.log(` Database Foreign Key Checks restored...`);
+  console.log(`\u272A  Database Foreign Key Checks restored...`);
 
   const scheduled = _startScheduledServices();
   console.log(_scheduledServicesLogStmt(scheduled));
@@ -267,6 +288,7 @@ async function _startupSequence() {
   _setIsInstantiated(true);
   console.log(_startupSuccessStmt());
 
+  _updateInstalled();
   return app;
 }
 
@@ -320,6 +342,13 @@ function _enableDBForeignKeyChecks(conn) {
   });
 }
 
+function _updateInstalled(){
+  if(!pFile.installed){
+    pFile.installed = true;
+    _writePFile();
+  }
+}
+
 function _startScheduledServices() {
   const { created } = createScheduledTasks();
   const started = start();
@@ -334,13 +363,30 @@ function _startAppListening() {
 }
 
 async function  _genInitialKeyPair(){
-  if(parsony.dropDB){
-    return await auth.createAPIKeyPair();
+  if(parsony.dropDB || !pFile.installed){
+    console.log(parsony.dropDB, pFile.installed);
+    const keyPair = await auth.createAPIKeyPair();
+    _saveInitialKeyPair(keyPair);
+    return keyPair;
+  }
+}
+
+function _writePFile(){
+  if(pFile){
+    const save = path.join(process.cwd(),'.parsony.json');
+    fs.writeFileSync(save,JSON.stringify(pFile,null,2))
+  }
+}
+
+function _saveInitialKeyPair(pair){
+  if(pFile){
+    pFile.init = pair;
+    _writePFile();
   }
 }
 
 function _keyPairStmt({key,secret}){
-  return `Generated initial Key Pair:
+  return `\n\u272A  Generated initial Key Pair:
   | Key:      ${key}
   | Secret:   ${secret} `
 }
@@ -349,21 +395,24 @@ function _startupLogStmt() {
   const port = parsony.configs[HTTP_PORT];
   const endpoint = parsony.configs[API_ENDPOINT];
   const timestamp = dateTime();
-  return ` HTTP Server started:
+  return `\n\u272A  HTTP Server started:
   | Listening on port: ${port} @ ${timestamp}.
   | API endpoint is : /${endpoint}`;
 }
 
 function _scheduledServicesLogStmt({ created, started }) {
-  return ` Scheduled services processed: 
+  return `\n\u272A  Scheduled services processed: 
   | [${created}] created...
   | [${started}] running...`;
 }
 
 function _startupStartStmt() {
   return `
- *******************************
- ****** STARTING PARSONY *******
+  
+  ${chalk.yellow(figlet.textSync("Parsony", { horizontalLayout: "full" }))}
+
+ ****************************************************
+ ******************* STARTING UP ********************
 
   `;
 }
@@ -371,8 +420,8 @@ function _startupStartStmt() {
 function _startupSuccessStmt() {
   return `
 
- ******* PARSONY IS LIVE *******
- *******************************
+ ***************** PARSONY IS LIVE ******************
+ ****************************************************
   `;
 }
 function _setIsInstantiated(bool) {
