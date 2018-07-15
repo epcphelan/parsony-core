@@ -6,8 +6,8 @@ const path = require("path");
 const express = require("express");
 const body_parser = require("body-parser");
 const fs = require("fs");
-const chalk = require('chalk');
-const figlet = require('figlet');
+const chalk = require("chalk");
+const figlet = require("figlet");
 const clear = require("clear");
 
 const { dateTime } = require("./lib/utils");
@@ -17,15 +17,15 @@ const models = require("./lib/models");
 const email = require("./lib/email");
 const sms = require("./lib/sms");
 const api = require("./lib/api");
-const auth =require('./lib/auth');
-const utils = require('./lib/utils');
+const auth = require("./lib/auth");
+const utils = require("./lib/utils");
 const services = require("./lib/services/services");
 const cache = require("./lib/cache");
 const errors = require("./lib/errors/errors.json");
 const EXIT = require("./lib/errors/startupExitMessages");
 
 const {
-  CONFIG: { API_DEBUG, HTTP_PORT, API_ENDPOINT },
+  CONFIG: { API_DEBUG, HTTP_PORT, API_ENDPOINT, LOGGING },
   SETTINGS: {
     DIRS,
     MODELS,
@@ -49,6 +49,7 @@ const ENV_VARS = {
   PARSONY_ENV: "PARSONY_ENV",
   API_DEBUG: "API_DEBUG",
   DROP_DB: "DROP_DB",
+  API_LOGGING: "API_LOGGING",
   LOCAL: "local"
 };
 
@@ -74,7 +75,6 @@ const init = settings => {
     throw new Error(`${EXIT.INIT_FAIL}${err.toString()}`);
   }
 };
-
 
 function _init(settings) {
   const configs = _configsFromSettings(settings);
@@ -114,6 +114,17 @@ function _bindApp() {
 
 function _bindMiddlewares() {
   app.use(body_parser.json());
+  if (_loggingEnabled()) {
+    const { log } = utils;
+    log(app);
+  }
+}
+
+function _loggingEnabled() {
+  const { API_LOGGING } = ENV_VARS;
+  const enabled = process.env[API_LOGGING] || parsony.configs[LOGGING];
+  console.log(chalk.yellow(`API Request logging is enabled`));
+  return enabled;
 }
 
 function _add404(pathTo404) {
@@ -150,7 +161,9 @@ function _setParsonyEnvVars() {
 }
 
 function _setDebugMode() {
-  parsony.debugMode = process.env[API_DEBUG] || parsony.configs[API_DEBUG] || false;
+  parsony.debugMode = process.env[API_DEBUG]
+    || parsony.configs[API_DEBUG]
+    || false;
 }
 
 function _setModuleConfigs() {
@@ -187,21 +200,21 @@ function _attachDirectoriesWith(settings) {
   }
 }
 
-function _projectFile(){
-  const p = path.join(process.cwd(),'.parsony.json');
-  if(!fs.existsSync(p)){
-    const pUtilPath = path.join(__dirname,'lib','utils','.parsony.json');
+function _projectFile() {
+  const p = path.join(process.cwd(), ".parsony.json");
+  if (!fs.existsSync(p)) {
+    const pUtilPath = path.join(__dirname, "lib", "utils", ".parsony.json");
     const pUtil = fs.readFileSync(pUtilPath);
-    fs.writeFileSync(p,pUtil);
+    fs.writeFileSync(p, pUtil);
   }
   pFile = require(p);
 }
 
-function _mkDirs(dirs){
-  for(let key in dirs){
-    if(dirs.hasOwnProperty(key)){
-      if(!fs.existsSync(dirs[key])){
-        fs.mkdirSync(dirs[key])
+function _mkDirs(dirs) {
+  for (let key in dirs) {
+    if (dirs.hasOwnProperty(key)) {
+      if (!fs.existsSync(dirs[key])) {
+        fs.mkdirSync(dirs[key]);
       }
     }
   }
@@ -232,7 +245,6 @@ function _attachModels(directory) {
 }
 
 function _attachServices(directory) {
-
   services.setServicesDirectory(directory);
   services.setConfigs(parsony.configs);
   services.setDebugMode(parsony.debugMode);
@@ -286,8 +298,8 @@ async function _startupSequence() {
   _startAppListening();
   console.log(_startupLogStmt());
 
-  const keyPair =await _genInitialKeyPair();
-  if(keyPair){
+  const keyPair = await _genInitialKeyPair();
+  if (keyPair) {
     console.log(_keyPairStmt(keyPair));
   }
 
@@ -298,7 +310,7 @@ async function _startupSequence() {
   return app;
 }
 
-function _startCache(){
+function _startCache() {
   cache.startCache();
 }
 
@@ -338,7 +350,7 @@ function _disableDBForeignKeyChecks(conn) {
   });
 }
 
-async function  _synchronizeModels() {
+async function _synchronizeModels() {
   return await parsony.models.sequelize.sync({ force: parsony.dropDB });
 }
 
@@ -352,8 +364,8 @@ function _enableDBForeignKeyChecks(conn) {
   });
 }
 
-function _updateInstalled(){
-  if(!pFile.installed){
+function _updateInstalled() {
+  if (!pFile.installed) {
     pFile.installed = true;
     _writePFile();
   }
@@ -372,33 +384,32 @@ function _startAppListening() {
   app.listen(parsony.configs[HTTP_PORT]);
 }
 
-async function  _genInitialKeyPair(){
-  if(parsony.dropDB || !pFile.installed){
-    console.log(parsony.dropDB, pFile.installed);
+async function _genInitialKeyPair() {
+  if (parsony.dropDB || !pFile.installed) {
     const keyPair = await auth.createAPIKeyPair();
     _saveInitialKeyPair(keyPair);
     return keyPair;
   }
 }
 
-function _writePFile(){
-  if(pFile){
-    const save = path.join(process.cwd(),'.parsony.json');
-    fs.writeFileSync(save,JSON.stringify(pFile,null,2))
+function _writePFile() {
+  if (pFile) {
+    const save = path.join(process.cwd(), ".parsony.json");
+    fs.writeFileSync(save, JSON.stringify(pFile, null, 2));
   }
 }
 
-function _saveInitialKeyPair(pair){
-  if(pFile){
+function _saveInitialKeyPair(pair) {
+  if (pFile) {
     pFile.init = pair;
     _writePFile();
   }
 }
 
-function _keyPairStmt({key,secret}){
+function _keyPairStmt({ key, secret }) {
   return `\n\u272A  Generated initial Key Pair:
   | Key:      ${key}
-  | Secret:   ${secret} `
+  | Secret:   ${secret} `;
 }
 
 function _startupLogStmt() {
@@ -407,7 +418,8 @@ function _startupLogStmt() {
   const timestamp = dateTime();
   return `\n\u272A  HTTP Server started:
   | Listening on port: ${port} @ ${timestamp}.
-  | API endpoint is : /${endpoint}`;
+  | API endpoint is : /${endpoint}
+  | Logging is ${_loggingEnabled() ? "ENABLED" : "DISABLED"}`;
 }
 
 function _scheduledServicesLogStmt({ created, started }) {
@@ -440,11 +452,11 @@ function _setIsInstantiated(bool) {
 
 const getBundle = () => {
   return {
-    env:parsony.env,
-    models : parsony.models,
-    debugMode:parsony.debugMode,
-    configs:parsony.configs,
-    dbPool:parsony.dbPool,
+    env: parsony.env,
+    models: parsony.models,
+    debugMode: parsony.debugMode,
+    configs: parsony.configs,
+    dbPool: parsony.dbPool,
     db,
     services,
     http,
@@ -455,7 +467,7 @@ const getBundle = () => {
     app,
     api,
     errors
-  }
+  };
 };
 
 module.exports = {
@@ -464,4 +476,3 @@ module.exports = {
   isLive: () => instantiated,
   getBundle
 };
-
