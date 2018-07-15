@@ -9,9 +9,9 @@ expose both JSON/RPC and RESTful API Endpoints.
 3. SHA256 encrypted request Signing.
 4. Interface and Handler based endpoint definition and implementation.
 4. Built-in support for:
-- Scheduled processes using cron.
-- Transactional emails
-- SMS via Twilio
+    * Scheduled processes using cron.
+    * Transactional emails
+    * SMS via Twilio
 
 Parsony Framework also includes a CLI Tool and Web App Starter Kit including React/Redux along with Semantic UI.
 
