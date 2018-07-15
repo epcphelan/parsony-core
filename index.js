@@ -20,6 +20,7 @@ const api = require("./lib/api");
 const auth =require('./lib/auth');
 const utils = require('./lib/utils');
 const services = require("./lib/services/services");
+const cache = require("./lib/cache");
 const errors = require("./lib/errors/errors.json");
 const EXIT = require("./lib/errors/startupExitMessages");
 
@@ -149,15 +150,17 @@ function _setParsonyEnvVars() {
 }
 
 function _setDebugMode() {
-  parsony.debugMode = process.env[API_DEBUG] || parsony.configs[API_DEBUG];
+  parsony.debugMode = process.env[API_DEBUG] || parsony.configs[API_DEBUG] || false;
 }
 
 function _setModuleConfigs() {
   const { configs } = parsony;
   const { setConfigs: emailConfigs } = email;
   const { setConfigs: smsConfigs } = sms;
+  const { setConfigs: cacheConfigs } = cache;
   emailConfigs(configs);
   smsConfigs(configs);
+  cacheConfigs(configs);
 }
 
 function _addParsonyToModules() {
@@ -253,6 +256,9 @@ async function _startupSequence() {
   clear();
   console.log(_startupStartStmt());
 
+  _startCache();
+  console.log(`\u272A  Cache server started...`);
+
   _setDBPool();
   console.log(`\u272A  Database Pool instantiated...`);
 
@@ -290,6 +296,10 @@ async function _startupSequence() {
 
   _updateInstalled();
   return app;
+}
+
+function _startCache(){
+  cache.startCache();
 }
 
 function _setDBPool() {
