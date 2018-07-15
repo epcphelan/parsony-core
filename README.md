@@ -15,7 +15,7 @@ expose both JSON/RPC and RESTful API Endpoints.
 
 Parsony Framework also includes a CLI Tool and Web App Starter Kit including React/Redux along with Semantic UI.
 
-###Installation
+### Installation
 ```
 $ npm install --save
 ```
