@@ -17,7 +17,7 @@ Parsony Framework also includes a CLI Tool and Web App Starter Kit including Rea
 
 ### Installation
 ```
-$ npm install --save
+$ npm install --save parsony
 ```
 
 ### Usage
