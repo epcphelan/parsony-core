@@ -114,7 +114,7 @@ function _bindApp() {
 
 function _bindMiddlewares() {
   app.use(body_parser.json());
-  if (_loggingEnabled()) {
+  if (_loggingEnabled() === true) {
     const { log } = utils;
     log(app);
   }
@@ -122,9 +122,7 @@ function _bindMiddlewares() {
 
 function _loggingEnabled() {
   const { API_LOGGING } = ENV_VARS;
-  const enabled = process.env[API_LOGGING] || parsony.configs[LOGGING];
-  console.log(chalk.yellow(`API Request logging is enabled`));
-  return enabled;
+  return process.env[API_LOGGING] || parsony.configs[LOGGING];
 }
 
 function _add404(pathTo404) {
