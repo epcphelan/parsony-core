@@ -159,7 +159,8 @@ function _setParsonyEnvVars() {
 }
 
 function _setDebugMode() {
-  parsony.debugMode = process.env[API_DEBUG]
+  const { API_DEBUG : ENV_API_DEBUG } = ENV_VARS;
+  parsony.debugMode = process.env[ENV_API_DEBUG ]
     || parsony.configs[API_DEBUG]
     || false;
 }
@@ -178,9 +179,11 @@ function _addParsonyToModules() {
   const { setParsony: dbParsony } = db;
   const { setParsony: emailParsony } = email;
   const { setParsony: smsParsony } = sms;
+  const { setParsony: apiParsony } = api;
   dbParsony(parsony);
   emailParsony(parsony);
   smsParsony(parsony);
+  apiParsony(parsony);
 }
 
 function _attachDirectoriesWith(settings) {
@@ -300,10 +303,8 @@ async function _startupSequence() {
   if (keyPair) {
     console.log(_keyPairStmt(keyPair));
   }
-
   _setIsInstantiated(true);
   console.log(_startupSuccessStmt());
-
   _updateInstalled();
   return app;
 }
@@ -417,7 +418,8 @@ function _startupLogStmt() {
   return `\n\u272A  HTTP Server started:
   | Listening on port: ${port} @ ${timestamp}.
   | API endpoint is : /${endpoint}
-  | Logging is ${_loggingEnabled() ? "ENABLED" : "DISABLED"}`;
+  | Logging is ${_loggingEnabled() === true ? "ENABLED" : "DISABLED"}
+  | API Debug is ${parsony.debugMode === true ? "ENABLED" :"DISABLED"}`;
 }
 
 function _scheduledServicesLogStmt({ created, started }) {
