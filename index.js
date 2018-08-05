@@ -457,6 +457,7 @@ const getBundle = () => {
     debugMode: parsony.debugMode,
     configs: parsony.configs,
     dbPool: parsony.dbPool,
+    dropDB: parsony.dropDB,
     db,
     services,
     http,
