@@ -272,6 +272,8 @@ async function _startupSequence() {
   _startCache();
   console.log(`\u272A  Cache server started...`);
 
+  await _flushCache();
+
   _setDBPool();
   console.log(`\u272A  Database Pool instantiated...`);
 
@@ -292,6 +294,7 @@ async function _startupSequence() {
 
   await _enableDBForeignKeyChecks(conn);
   console.log(`\u272A  Database Foreign Key Checks restored...`);
+
 
   const scheduled = _startScheduledServices();
   console.log(_scheduledServicesLogStmt(scheduled));
@@ -347,6 +350,12 @@ function _disableDBForeignKeyChecks(conn) {
       reject(e);
     }
   });
+}
+
+async function _flushCache(){
+  if(parsony.dropDB){
+    await cache.flushAll();
+  }
 }
 
 async function _synchronizeModels() {
@@ -467,7 +476,8 @@ const getBundle = () => {
     sms,
     app,
     api,
-    errors
+    errors,
+    cache
   };
 };
 
