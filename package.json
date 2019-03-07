@@ -1,6 +1,6 @@
 {
   "name": "parsony",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "API Engine for Parsony Framework.",
   "keywords": [
     "JSON-RPC, API, Rapid Development"
