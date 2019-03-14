@@ -35,14 +35,15 @@ const {
     TEMPLATES,
     FILES,
     CONFIGS,
-    _404
+    _404,
+    RUN_JOBS
   }
 } = require("./lib/enums");
 
 const {
   setScheduledDirectory,
   createScheduledTasks,
-  start
+  start : startJobs
 } = require("./lib/scheduled");
 
 const ENV_VARS = {
@@ -380,12 +381,19 @@ function _updateInstalled() {
 }
 
 function _startScheduledServices() {
-  const { created } = createScheduledTasks();
-  const started = start();
-  return {
-    created,
-    started
-  };
+  if(parsony.configs[RUN_JOBS]){
+    const { created } = createScheduledTasks();
+    const started = startJobs();
+    return {
+      created,
+      started
+    };
+  } else{
+    return {
+      created:0,
+      started:0
+    }
+  }
 }
 
 function _startAppListening() {
