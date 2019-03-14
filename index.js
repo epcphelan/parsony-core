@@ -25,7 +25,7 @@ const errors = require("./lib/errors/errors.json");
 const EXIT = require("./lib/errors/startupExitMessages");
 
 const {
-  CONFIG: { API_DEBUG, HTTP_PORT, API_ENDPOINT, LOGGING },
+  CONFIG: { API_DEBUG, HTTP_PORT, API_ENDPOINT, LOGGING, RUN_JOBS},
   SETTINGS: {
     DIRS,
     MODELS,
@@ -35,8 +35,7 @@ const {
     TEMPLATES,
     FILES,
     CONFIGS,
-    _404,
-    RUN_JOBS
+    _404
   }
 } = require("./lib/enums");
 
