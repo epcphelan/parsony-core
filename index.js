@@ -113,7 +113,7 @@ function _bindApp() {
 }
 
 function _bindMiddlewares() {
-  app.use(body_parser.json());
+  app.use(body_parser.json({ limit: '50mb' }));
   if (_loggingEnabled() === true) {
     const { log } = utils;
     log(app);
