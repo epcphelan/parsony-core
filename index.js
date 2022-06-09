@@ -9,6 +9,7 @@ const fs = require("fs");
 const chalk = require("chalk");
 const figlet = require("figlet");
 const clear = require("clear");
+const compression = require("compression");
 
 const { dateTime } = require("./lib/utils");
 const db = require("./lib/db");
@@ -115,6 +116,7 @@ function _bindApp() {
 function _bindMiddlewares() {
   app.use(express.json({limit: '50mb', extended: true}))
   app.use(express.urlencoded({limit: '50mb', extended: true}))
+  app.use(compression());
   if (_loggingEnabled() === true) {
     const { log } = utils;
     log(app);
