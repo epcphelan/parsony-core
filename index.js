@@ -68,7 +68,7 @@ const parsony = {};
 let instantiated = false;
 let pFile;
 let app;
-
+let server;
 const init = settings => {
   try {
     _init(settings);
@@ -399,7 +399,7 @@ function _startScheduledServices() {
 }
 
 function _startAppListening() {
-  app.listen(parsony.configs[HTTP_PORT]);
+  server = app.listen(parsony.configs[HTTP_PORT]);
 }
 
 async function _genInitialKeyPair() {
@@ -487,7 +487,8 @@ const getBundle = () => {
     app,
     api,
     errors,
-    cache
+    cache,
+    server
   };
 };
 
