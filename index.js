@@ -124,8 +124,7 @@ function _bindMiddlewares() {
 }
 
 function _loggingEnabled() {
-  const { API_LOGGING } = ENV_VARS;
-  return process.env[API_LOGGING] || parsony.configs[LOGGING];
+  return process.env.API_LOGGING === 'true' || parsony.configs[LOGGING];
 }
 
 function _add404(pathTo404) {
