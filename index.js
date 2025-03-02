@@ -4,7 +4,6 @@
  */
 const path = require("path");
 const express = require("express");
-const body_parser = require("body-parser");
 const fs = require("fs");
 const chalk = require("chalk");
 const figlet = require("figlet");
